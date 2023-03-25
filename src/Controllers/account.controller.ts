@@ -1,9 +1,8 @@
 import { Request, Response } from 'express'
-import { hash, compare } from 'bcrypt'
+import { compare } from 'bcrypt'
 
-import { hashSaltRound } from '../Config/config'
-import db, { accounts } from '../Models'
-import { IAccount } from '../Types'
+import { accounts } from '../Models'
+import { hashFunction } from '../Utils/UtilityFunctions'
 
 const Account = accounts
 
@@ -35,48 +34,14 @@ const createAsync = async (req: Request, res: Response) => {
       return
     }
 
-    const data: IAccount = {
+    const data = {
       username: req.body.username,
-      password: await hash(req.body.password, hashSaltRound),
+      password: (await hashFunction(req.body.password)) ?? '',
       role: req.body.role,
     }
     const newAccount = new Account(data)
     const result = await newAccount.save()
     res.status(200).send({ result })
-  } catch (error) {
-    res.status(400).send({ message: error })
-  }
-}
-
-const loginAsync = async (req: Request, res: Response) => {
-  try {
-    const { username, password } = req.query
-
-    if (username && password) {
-      const result = await Account.findOne({
-        username,
-      })
-
-      if (result?.password) {
-        const isPasswordTrue = await compare(
-          password.toString(),
-          result?.password
-        )
-
-        if (isPasswordTrue) {
-          res.status(200).send({ result })
-        } else {
-          res.status(400).send({ message: 'Password is incorrect!' })
-        }
-      } else {
-        res.status(404).send({ message: 'Username is not exist!' })
-        return
-      }
-    } else {
-      res
-        .status(400)
-        .send({ message: 'Fill the username and password please!' })
-    }
   } catch (error) {
     res.status(400).send({ message: error })
   }
@@ -131,7 +96,7 @@ const updateAsync = async (req: Request, res: Response) => {
       res.status(400).send({ message: 'Please fill the id and data!' })
     }
     if (data.password && data.password.length != 0) {
-      data.password = await hash(data.password, hashSaltRound)
+      data.password = await hashFunction(data.password)
     }
     const result = await Account.findByIdAndUpdate(id, data)
     if (result) {
@@ -150,5 +115,4 @@ export default {
   getByIdAsync,
   updateAsync,
   findOneAsync,
-  loginAsync,
 }

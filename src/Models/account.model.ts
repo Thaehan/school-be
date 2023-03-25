@@ -3,7 +3,7 @@ import { InferSchemaType, Mongoose, Schema, Types } from 'mongoose'
 const accountSchema = new Schema(
   {
     username: { type: String, required: true, min: 6, max: 16 },
-    password: { type: String, required: true, min: 8, max: 16 },
+    password: { type: String, required: true, min: 6 },
     role: {
       type: String,
       enum: ['admin', 'teacher', 'student'],
@@ -28,7 +28,4 @@ const accountModel = (mongoose: Mongoose) => {
 
 export type IAccount = InferSchemaType<typeof accountSchema>
 
-export default {
-  accountModel,
-  accountSchema,
-}
+export default accountModel

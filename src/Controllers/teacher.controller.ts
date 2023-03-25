@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 
-import { hashSaltRound } from '../Config/config'
 import { accounts, teachers } from '../Models'
 import { ITeacher } from '../Types'
 
@@ -23,7 +22,7 @@ const createAsync = async (req: Request, res: Response) => {
       } else {
         const existTeacher = await Teacher.find().or([
           {
-            teacher_id: teacherData.teacher_id,
+            teacher_code: teacherData.teacher_code,
           },
           { user_id: teacherData.user_id },
         ])

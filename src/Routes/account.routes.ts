@@ -1,15 +1,14 @@
 import express, { Express } from 'express'
 
 import accountController from '../Controllers/account.controller'
+import { auth } from '../Middlewares/auth'
 
 const accountRoutes = (app: Express) => {
   const router = express.Router()
 
   router.post('/', accountController.createAsync)
 
-  router.get('/', accountController.getManyAsync)
-
-  router.get('/login', accountController.loginAsync)
+  router.get('/', auth, accountController.getManyAsync)
 
   router.get('/:id', accountController.getByIdAsync)
 

@@ -9,9 +9,7 @@ const Account = accounts
 
 const createAsync = async (req: Request, res: Response) => {
   try {
-    console.log('student1')
     const studentData: IStudent = req.body
-    console.log('student2', studentData)
 
     const existAccount = await Account.findById(studentData.user_id)
     if (!existAccount) {
@@ -24,7 +22,7 @@ const createAsync = async (req: Request, res: Response) => {
       } else {
         const existStudent = await Student.find().or([
           {
-            student_id: studentData.student_id,
+            student_code: studentData.student_code,
           },
           { user_id: studentData.user_id },
         ])

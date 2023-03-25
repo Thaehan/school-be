@@ -8,11 +8,16 @@ const auth = async (req: Request, res: Response, next: Function) => {
     const token = req.headers.authorization?.split(' ')[1]
     if (token) {
       const decodedToken = jwt.verify(token, ACCESS_TOKEN_STATIC)
-      req.body.decodedData = decodedToken
+      req.body.user = decodedToken
+      if (!decodedToken) {
+        res.status(401).send({ message: 'Unauthorized' })
+        return;
+      }
       next()
     }
   } catch (error) {
     res.status(401).send({ message: 'Unauthorized' })
+    return;
   }
 }
 

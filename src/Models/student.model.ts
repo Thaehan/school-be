@@ -3,7 +3,7 @@ import { InferSchemaType, Mongoose, Schema, Types } from 'mongoose'
 const studentSchema = new Schema(
   {
     user_id: { type: Types.ObjectId, required: true },
-    student_id: { type: String, required: true },
+    student_code: { type: String, required: true },
     name: {
       type: {
         first_name: { type: String, required: true },
@@ -19,7 +19,7 @@ const studentSchema = new Schema(
     academic_year: { type: Number, required: true },
     specialization: { type: String, required: true },
     nation: { type: String, required: true },
-    joined_class_ids: [{ type: Types.ObjectId }],
+    selected_topic_ids: { type: [Types.ObjectId], required: true, default: []}
   },
   {
     timestamps: true,
@@ -39,7 +39,4 @@ const studentModel = (mongoose: Mongoose) => {
 
 export type IStudent = InferSchemaType<typeof studentSchema>
 
-export default {
-  studentModel,
-  studentSchema,
-}
+export default studentModel
