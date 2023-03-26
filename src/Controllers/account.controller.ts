@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { compare } from 'bcrypt'
 
 import { accounts } from '../Models'
 import { hashFunction } from '../Utils/UtilityFunctions'
@@ -44,6 +43,7 @@ const createAsync = async (req: Request, res: Response) => {
     res.status(200).send({ result })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -59,6 +59,7 @@ const findOneAsync = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -70,6 +71,7 @@ const getManyAsync = async (req: Request, res: Response) => {
     res.status(200).send({ data: result })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -85,6 +87,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
     res.status(200).send({ result })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -106,6 +109,25 @@ const updateAsync = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).send({ message: error })
+    return
+  }
+}
+
+const deleteByIdAsync = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (!id) {
+      res.status(400).send({ message: 'Missing id field' })
+    }
+
+    await Account.findByIdAndDelete(id)
+
+    res.status(200).send({ message: 'Deleted account' })
+  } catch (error) {
+    console.error(error)
+    res.status(400).send({ message: 'Account with id does not exist' })
+    return
   }
 }
 
@@ -115,4 +137,5 @@ export default {
   getByIdAsync,
   updateAsync,
   findOneAsync,
+  deleteByIdAsync,
 }

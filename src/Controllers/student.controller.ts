@@ -1,47 +1,80 @@
 import { Request, Response } from 'express'
 
-import { hashSaltRound } from '../Config/config'
 import { accounts, students } from '../Models'
 import { IStudent } from '../Types'
+import { hashSyncFunction } from '../Utils/UtilityFunctions'
 
 const Student = students
 const Account = accounts
 
 const createAsync = async (req: Request, res: Response) => {
   try {
-    const studentData: IStudent = req.body
+    const {
+      student_code,
+      name,
+      date_of_birth,
+      gender,
+      phone_number,
+      address,
+      academic_year,
+      specialization,
+      selected_topic_id,
+    }: IStudent = req.body
 
-    const existAccount = await Account.findById(studentData.user_id)
-    if (!existAccount) {
-      res.status(404).send({ message: 'User_id is not exist!' })
+    const { username, password } = req.body
+
+    if (
+      !student_code ||
+      !name ||
+      !date_of_birth ||
+      !gender ||
+      !phone_number ||
+      !address ||
+      !username ||
+      !password
+    ) {
+      res.status(400).send({ message: 'Missing required fields' })
       return
-    } else {
-      if (existAccount.role != 'student') {
-        res.status(400).send({ message: 'Role of account is not match!' })
-        return
-      } else {
-        const existStudent = await Student.find().or([
-          {
-            student_code: studentData.student_code,
-          },
-          { user_id: studentData.user_id },
-        ])
-        if (existStudent.length != 0) {
-          res.status(400).send({
-            message:
-              'Student Id is exist or user has a student account already!',
-          })
-          return
-        } else {
-          const newStudent = new Student(studentData)
-          const resData = await newStudent.save()
-          res.status(200).send({ result: resData.toJSON() })
-        }
-      }
     }
+
+    const existedAccount = await Account.findOne({ username })
+
+    if (existedAccount) {
+      res.status(400).send({ message: 'Username existed' })
+      return
+    }
+
+    const existedStudent = await Student.findOne({ student_code })
+
+    if (existedStudent) {
+      res.status(400).send({ message: 'Student code existed' })
+      return
+    }
+
+    const newAccount = await Account.create({
+      username,
+      password: hashSyncFunction(password),
+      role: 'student',
+    })
+
+    const newStudent = await Student.create({
+      user_id: newAccount.id,
+      student_code,
+      name,
+      date_of_birth,
+      gender,
+      phone_number,
+      address,
+      academic_year,
+      specialization,
+      selected_topic_id,
+    })
+
+    res.status(200).send({ data: newStudent })
   } catch (error) {
     console.error(error)
     res.status(400).send({ message: 'Missing student information!' })
+    return
   }
 }
 
@@ -53,6 +86,7 @@ const getManyAsync = async (req: Request, res: Response) => {
     res.status(200).send({ result })
   } catch (error) {
     res.status(400).send({ message: 'Lỗi query truyền vào!' })
+    return
   }
 }
 
@@ -74,6 +108,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
       .send({ message: `Cannot find student with id: ${studentId}` })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -93,6 +128,7 @@ const updateByIdAsync = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).send({ message: 'Id is invalid' })
+    return
   }
 }
 

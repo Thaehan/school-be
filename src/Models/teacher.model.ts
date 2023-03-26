@@ -16,10 +16,8 @@ const teacherSchema = new Schema(
     email: { type: String, required: true },
     phone_number: { type: String, required: true },
     address: { type: String, required: true },
-    nation: { type: String, required: true },
-    joined_date: { type: Date, required: true },
     main_courses: [String],
-    topics: [Types.ObjectId],
+    topic_ids: { type: [Types.ObjectId], default: [] },
   },
   {
     timestamps: true,
@@ -28,7 +26,7 @@ const teacherSchema = new Schema(
 
 const teacherModel = (mongoose: Mongoose) => {
   teacherSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject()
+    const { _id, ...object } = this.toObject()
     object.id = _id
     return object
   })

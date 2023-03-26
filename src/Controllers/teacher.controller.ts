@@ -2,47 +2,79 @@ import { Request, Response } from 'express'
 
 import { accounts, teachers } from '../Models'
 import { ITeacher } from '../Types'
+import { hashFunction } from '../Utils/UtilityFunctions'
 
 const Teacher = teachers
 const Account = accounts
 
 const createAsync = async (req: Request, res: Response) => {
   try {
-    const teacherData: ITeacher = req.body
-    console.log('teacherData ', teacherData)
+    const {
+      teacher_code,
+      name,
+      date_of_birth,
+      gender,
+      phone_number,
+      address,
+      main_courses,
+      topic_ids,
+    }: ITeacher = req.body
+    const { username, password } = req.body
 
-    const existAccount = await Account.findById(teacherData.user_id)
-    if (!existAccount) {
-      res.status(404).send({ message: 'User_id is not exist!' })
+    if (
+      !username ||
+      !password ||
+      !teacher_code ||
+      !name ||
+      !date_of_birth ||
+      !gender ||
+      !phone_number ||
+      !address
+    ) {
+      res.status(400).send({ message: 'Missing required field(s)' })
       return
-    } else {
-      if (existAccount.role != 'teacher') {
-        res.status(400).send({ message: 'Account role is not match!' })
-        return
-      } else {
-        const existTeacher = await Teacher.find().or([
-          {
-            teacher_code: teacherData.teacher_code,
-          },
-          { user_id: teacherData.user_id },
-        ])
-        if (existTeacher.length != 0) {
-          res
-            .status(400)
-            .send({
-              message: 'Teacher is exist or user has a teacher account!',
-            })
-          return
-        } else {
-          const newTeacher = new Teacher(teacherData)
-          const resData = await newTeacher.save()
-          res.status(200).send({ result: resData.toJSON() })
-        }
-      }
     }
+
+    const accountWithUsername = await Account.findOne({ username })
+
+    if (accountWithUsername) {
+      res.status(400).send({ message: 'Username is existed' })
+      return
+    }
+
+    const existedTeacher = await Teacher.findOne({ teacher_code })
+
+    if (existedTeacher) {
+      res.status(400).send({ message: 'Teacher code existed' })
+      return
+    }
+
+    const newAccount = await Account.create({
+      username,
+      password: hashFunction(password),
+      role: 'teacher',
+    })
+
+    const newTeacher = await Teacher.create({
+      teacher_code,
+      name,
+      date_of_birth,
+      gender,
+      phone_number,
+      address,
+      main_courses,
+      topic_ids,
+      user_id: newAccount.id,
+    })
+
+    res.status(200).send({
+      message: 'Teacher created',
+      data: { ...newTeacher, username, password },
+    })
   } catch (error) {
     console.error(error)
     res.status(400).send({ message: 'Missing student information!' })
+    return
   }
 }
 
@@ -54,6 +86,7 @@ const getManyAsync = async (req: Request, res: Response) => {
     res.status(200).send({ result })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -69,6 +102,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
     res.status(200).send({ result })
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 
@@ -89,6 +123,7 @@ const updateByIdAsync = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).send({ message: error })
+    return
   }
 }
 

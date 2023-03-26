@@ -16,10 +16,9 @@ const studentSchema = new Schema(
     email: { type: String, required: true },
     phone_number: { type: String, required: true },
     address: { type: String, required: true },
-    academic_year: { type: Number, required: true },
-    specialization: { type: String, required: true },
-    nation: { type: String, required: true },
-    selected_topic_ids: { type: [Types.ObjectId], required: true, default: []}
+    academic_year: { type: Number, required: false },
+    specialization: { type: String, required: false },
+    selected_topic_id: { type: Types.ObjectId, required: false },
   },
   {
     timestamps: true,
@@ -28,7 +27,7 @@ const studentSchema = new Schema(
 
 const studentModel = (mongoose: Mongoose) => {
   studentSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject()
+    const { _id, ...object } = this.toObject()
     object.id = _id
     return object
   })

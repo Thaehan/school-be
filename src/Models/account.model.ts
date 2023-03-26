@@ -1,8 +1,8 @@
-import { InferSchemaType, Mongoose, Schema, Types } from 'mongoose'
+import { InferSchemaType, Mongoose, Schema } from 'mongoose'
 
 const accountSchema = new Schema(
   {
-    username: { type: String, required: true, min: 6, max: 16 },
+    username: { type: String, required: true, min: 4, max: 16 },
     password: { type: String, required: true, min: 6 },
     role: {
       type: String,
@@ -17,7 +17,7 @@ const accountSchema = new Schema(
 
 const accountModel = (mongoose: Mongoose) => {
   accountSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject()
+    const { _id, ...object } = this.toObject()
     object.id = _id
     return object
   })

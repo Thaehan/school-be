@@ -1,9 +1,10 @@
-import express, { Express, Request, Response } from 'express'
+import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 
 import db from './Models'
 import { setRoutes } from './Routes'
+import { createAdmin } from './Utils/Migrate'
 
 dotenv.config()
 const app = express()
@@ -22,6 +23,7 @@ db.mongoose
   .connect(db.url)
   .then(() => {
     console.log('Connected to database')
+    createAdmin()
   })
   .catch((error) => {
     console.error(error)

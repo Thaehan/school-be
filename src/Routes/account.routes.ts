@@ -10,9 +10,11 @@ const accountRoutes = (app: Express) => {
 
   router.get('/', auth, accountController.getManyAsync)
 
-  router.get('/:id', accountController.getByIdAsync)
+  router.get('/:id', auth, accountController.getByIdAsync)
 
-  router.post('/update', accountController.updateAsync)
+  router.delete('/:id', auth, accountController.deleteByIdAsync)
+
+  router.post('/update', auth, accountController.updateAsync)
 
   app.use('/api/accounts', router)
 }
