@@ -83,7 +83,7 @@ const getManyAsync = async (req: Request, res: Response) => {
     const query = req.query
     console.log(query)
     const result = await Teacher.find(query)
-    res.status(200).send({ result })
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: error })
     return
@@ -99,7 +99,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
       return
     }
     const result = await Teacher.findById(studentId)
-    res.status(200).send({ result })
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: error })
     return

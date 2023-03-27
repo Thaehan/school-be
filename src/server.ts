@@ -10,7 +10,7 @@ dotenv.config()
 const app = express()
 const port = process.env.PORT || 8080
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:8081'],
 }
 
 app.use(cors(corsOptions))

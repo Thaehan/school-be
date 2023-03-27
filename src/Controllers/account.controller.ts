@@ -40,7 +40,7 @@ const createAsync = async (req: Request, res: Response) => {
     }
     const newAccount = new Account(data)
     const result = await newAccount.save()
-    res.status(200).send({ result })
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: error })
     return
@@ -55,7 +55,7 @@ const findOneAsync = async (req: Request, res: Response) => {
       res.status(404).send({ message: 'No match found!' })
       return
     } else {
-      res.status(200).send({ result })
+      res.status(200).send(result)
     }
   } catch (error) {
     res.status(400).send({ message: error })
@@ -84,7 +84,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
       return
     }
     const result = await Account.findById(userId)
-    res.status(200).send({ result })
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: error })
     return

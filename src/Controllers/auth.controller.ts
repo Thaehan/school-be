@@ -27,7 +27,7 @@ const loginAsync = async (req: Request, res: Response) => {
       return
     }
 
-    const isPasswordTrue = await compare(password.toString(), result.password)
+    const isPasswordTrue = await compare(password, result.password)
 
     if (!isPasswordTrue) {
       res.status(400).send({ message: 'Password is incorrect!' })
@@ -42,20 +42,24 @@ const loginAsync = async (req: Request, res: Response) => {
 
     if (result.role === 'student') {
       const student = await Student.findOne({ user_id: result.id })
-      res
-        .status(200)
-        .send({ user: { ...result, studentId: student?.id }, token })
+      res.status(200).send({
+        user: { ...result.toJSON() },
+        studentData: student?.toJSON(),
+        token,
+      })
       return
     }
     if (result.role === 'teacher') {
       const teacher = await Teacher.findOne({ user_id: result.id })
-      res
-        .status(200)
-        .send({ user: { ...result, teacherId: teacher?.id }, token })
+      res.status(200).send({
+        user: { ...result.toJSON() },
+        teacherData: teacher?.toJSON(),
+        token,
+      })
       return
     }
 
-    res.status(200).send({ user: { result }, token })
+    res.status(200).send({ user: result, token })
   } catch (error) {
     res.status(400).send({ message: error })
     return

@@ -4,7 +4,7 @@ const topicSchema = new Schema(
   {
     topic_name: { type: String, required: true },
     detail: { type: String, required: true },
-    teacher_id: { type: Types.ObjectId, required: true },
+    teacher_id: { type: String, required: true },
   },
   {
     timestamps: true,

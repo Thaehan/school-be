@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 
-import { topics } from '../Models'
+import { topics, teachers } from '../Models'
 import { ITopic } from '../Models/topic.model'
 
 const Topic = topics
+const Teacher = teachers
 
 const createAsync = async (req: Request, res: Response) => {
   try {
@@ -40,7 +41,34 @@ const getManyAsync = async (req: Request, res: Response) => {
   try {
     const query = req.query
     const result = await Topic.find(query)
-    res.status(200).send({ result })
+
+    const topicIdList: string[] = []
+
+    result.forEach((item) => {
+      if (!topicIdList.includes(item.id)) {
+        topicIdList.push(item.id)
+      }
+    })
+
+    const creatorList = await Teacher.find({ id: { $in: topicIdList } })
+    const creatorListRef: Record<string, any> = {}
+
+    creatorList.forEach((item) => {
+      if (!creatorListRef[item.id]) {
+        creatorListRef[item.id] = item.toJSON()
+      }
+    })
+
+    console.log('creator', creatorListRef)
+
+    const resultList = result.map((item) => {
+      return {
+        ...item.toJSON(),
+        creator: creatorListRef[item.toJSON().teacher_id],
+      }
+    })
+
+    res.status(200).send(resultList)
   } catch (error) {
     res.status(400).send({ message: 'Lỗi query truyền vào!' })
     return
@@ -59,7 +87,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
     const result = await Topic.findById(id)
 
     if (result) {
-      res.status(200).send({ result })
+      res.status(200).send(result)
       return
     }
 

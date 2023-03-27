@@ -18,7 +18,7 @@ const studentSchema = new Schema(
     address: { type: String, required: true },
     academic_year: { type: Number, required: false },
     specialization: { type: String, required: false },
-    selected_topic_id: { type: Types.ObjectId, required: false },
+    selected_topic_id: { type: String, required: false },
   },
   {
     timestamps: true,
