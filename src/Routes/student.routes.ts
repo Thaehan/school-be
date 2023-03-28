@@ -13,6 +13,8 @@ const studentRoutes = (app: Express) => {
 
   router.post('/update', studentController.updateByIdAsync)
 
+  router.put('/', studentController.studentSelectTopicAsync)
+
   app.use('/api/students', router)
 }
 

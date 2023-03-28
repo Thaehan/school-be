@@ -132,9 +132,30 @@ const updateByIdAsync = async (req: Request, res: Response) => {
   }
 }
 
+const studentSelectTopicAsync = async (req: Request, res: Response) => {
+  try {
+    const { student_id, topic_id } = req.body
+
+    if (!student_id || !topic_id) {
+      res.status(400).send({ message: 'Missing required field(s)' })
+      return
+    }
+
+    await Student.findByIdAndUpdate(student_id, {
+      selected_topic_id: topic_id,
+    })
+
+    res.status(200).send('Student selected topic')
+  } catch (error) {
+    console.error(error)
+    res.status(400).send({ message: 'System error' })
+  }
+}
+
 export default {
   createAsync,
   getByIdAsync,
   getManyAsync,
   updateByIdAsync,
+  studentSelectTopicAsync,
 }

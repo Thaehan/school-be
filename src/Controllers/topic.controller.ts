@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 
-import { topics, teachers } from '../Models'
+import { topics, teachers, students } from '../Models'
 import { ITopic } from '../Models/topic.model'
 
 const Topic = topics
@@ -61,7 +61,7 @@ const getManyAsync = async (req: Request, res: Response) => {
 
     console.log('creator', creatorListRef)
 
-    const resultList = result.map((item) => {
+    const resultList: any = result.map((item) => {
       return {
         ...item.toJSON(),
         creator: creatorListRef[item.toJSON().teacher_id],
