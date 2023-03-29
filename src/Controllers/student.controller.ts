@@ -121,7 +121,9 @@ const updateByIdAsync = async (req: Request, res: Response) => {
     } else {
       const result = await Student.findByIdAndUpdate(id, data)
       if (result) {
-        res.status(200).send({ message: 'Student updated' })
+        res
+          .status(200)
+          .send({ message: 'Student updated', data: result.toJSON() })
       } else {
         res.status(400).send({ message: 'Error when update student!' })
       }
