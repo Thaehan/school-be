@@ -39,8 +39,24 @@ const createAsync = async (req: Request, res: Response) => {
 
 const getManyAsync = async (req: Request, res: Response) => {
   try {
-    const query = req.query
-    const result = await Topic.find(query)
+    const { search } = req.query
+
+    let condition: any = {}
+
+    if (search && typeof search === 'string') {
+      const standard = search.toLowerCase()
+      condition = {
+        $or: [
+          {
+            detail: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+          },
+          { topic_name: { $regex: new RegExp('.*' + standard + '.*', 'i') } },
+        ],
+      }
+    }
+    const result = await Topic.find(condition)
+
+    console.log('topics', result.length)
 
     const topicIdList: string[] = []
 
@@ -58,8 +74,6 @@ const getManyAsync = async (req: Request, res: Response) => {
         creatorListRef[item.id] = item.toJSON()
       }
     })
-
-    console.log('creator', creatorListRef)
 
     const resultList: any = result.map((item) => {
       return {

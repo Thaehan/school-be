@@ -13,6 +13,10 @@ const setRoutes = (app: Express) => {
   studentRoutes(app)
   teacherRoutes(app)
   topicRoutes(app)
+
+  app.get('/', (req, res) => {
+    res.status(200).send({ message: 'OK' })
+  })
 }
 
 export { setRoutes }
