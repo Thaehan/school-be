@@ -1,4 +1,4 @@
-import { accounts, students, teachers, topics } from '../Models'
+import { accounts, students, teachers, topics, category } from '../Models'
 import { IAccount } from '../Types'
 import { hashFunction, hashSyncFunction } from './UtilityFunctions'
 
@@ -6,12 +6,26 @@ const Account = accounts
 const Student = students
 const Teacher = teachers
 const Topic = topics
+const Category = category
 
 const ADMIN_ACCOUNT = {
   username: 'admin',
   password: '',
   role: 'admin',
 }
+
+const listCategory: any[] = [
+  {
+    category_name: 'Lập trình nhúng',
+    category_code: 'LTN',
+    description: 'Lap trinh nhung',
+  },
+  {
+    category_name: 'IOT',
+    category_code: 'IOT',
+    description: 'IOT',
+  },
+]
 
 const listTeachers: any[] = [
   {
@@ -203,6 +217,8 @@ const createAdmin = async () => {
 
 const initData = async () => {
   try {
+    const newCategory = await Category.create(listCategory)
+
     const teacherToAccount = listTeachers.map((item) => {
       return {
         username: item.username,
@@ -218,6 +234,7 @@ const initData = async () => {
           return {
             ...listTeachers[index],
             user_id: data.id,
+            main_courses: [newCategory[index % 2].id],
           }
         }
       }
@@ -230,11 +247,10 @@ const initData = async () => {
         return {
           ...item,
           teacher_id: createdTeachers[index].id,
+          tags: [newCategory[index % 2].id],
         }
       }
     })
-
-    console.log('topc', listTopicWithTeacherId)
 
     const newTopics = await Topic.create(listTopicWithTeacherId)
 

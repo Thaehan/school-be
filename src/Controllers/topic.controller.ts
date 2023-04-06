@@ -1,10 +1,11 @@
 import { Request, Response } from 'express'
 
-import { topics, teachers, students } from '../Models'
+import { topics, teachers, students, category } from '../Models'
 import { ITopic } from '../Models/topic.model'
 
 const Topic = topics
 const Teacher = teachers
+const Category = category
 
 const createAsync = async (req: Request, res: Response) => {
   try {
@@ -48,41 +49,62 @@ const getManyAsync = async (req: Request, res: Response) => {
       condition = {
         $or: [
           {
-            detail: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+            category_name: { $regex: new RegExp('.*' + standard + '.*', 'i') },
           },
-          { topic_name: { $regex: new RegExp('.*' + standard + '.*', 'i') } },
+          {
+            category_code: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+          },
         ],
       }
     }
-    const result = await Topic.find(condition)
 
-    console.log('topics', result.length)
+    const listCategory = await Category.find(condition)
+    const listCategoryId = listCategory.map((item) => item.id)
 
-    const topicIdList: string[] = []
-
-    result.forEach((item) => {
-      if (!topicIdList.includes(item.id)) {
-        topicIdList.push(item.id)
-      }
+    const listTeacher = await Teacher.find({
+      main_courses: { $in: listCategoryId },
     })
 
-    const creatorList = await Teacher.find({ id: { $in: topicIdList } })
-    const creatorListRef: Record<string, any> = {}
-
-    creatorList.forEach((item) => {
-      if (!creatorListRef[item.id]) {
-        creatorListRef[item.id] = item.toJSON()
-      }
+    const listTopic = await Topic.find({
+      tags: { $in: listCategoryId },
     })
 
-    const resultList: any = result.map((item) => {
-      return {
-        ...item.toJSON(),
-        creator: creatorListRef[item.toJSON().teacher_id],
-      }
-    })
+    const result = {
+      teachers: listTeacher,
+      topics: listTopic.map((item) => {
+        return {
+          ...item.toJSON(),
+          creator: listTeacher.find((teacher) => {
+            return teacher.id == item.teacher_id
+          }),
+        }
+      }),
+    }
 
-    res.status(200).send(resultList)
+    // if (search && typeof search === 'string') {
+    //   const standard = search.toLowerCase()
+    //   condition = {
+    //     $or: [
+    //       {
+    //         detail: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+    //       },
+    //       { topic_name: { $regex: new RegExp('.*' + standard + '.*', 'i') } },
+    //     ],
+    //   }
+    // }
+    // const result = await Topic.find(condition)
+
+    // console.log('topics', result.length)
+
+    // const topicIdList: string[] = []
+
+    // result.forEach((item) => {
+    //   if (!topicIdList.includes(item.id)) {
+    //     topicIdList.push(item.id)
+    //   }
+    // })
+
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: 'Lỗi query truyền vào!' })
     return

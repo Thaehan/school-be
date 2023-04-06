@@ -4,6 +4,10 @@ const topicSchema = new Schema(
   {
     topic_name: { type: String, required: true },
     detail: { type: String, required: true },
+    tags: {
+      type: [String],
+      required: false,
+    },
     teacher_id: { type: String, required: true },
   },
   {
