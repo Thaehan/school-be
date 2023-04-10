@@ -40,7 +40,7 @@ const createAsync = async (req: Request, res: Response) => {
 
 const getManyAsync = async (req: Request, res: Response) => {
   try {
-    const { search } = req.query
+    const { search, ids } = req.query
 
     let condition: any = {}
 
@@ -55,6 +55,12 @@ const getManyAsync = async (req: Request, res: Response) => {
             category_code: { $regex: new RegExp('.*' + standard + '.*', 'i') },
           },
         ],
+      }
+    }
+
+    if (ids) {
+      condition = {
+        _id: { $in: ids },
       }
     }
 
@@ -80,29 +86,6 @@ const getManyAsync = async (req: Request, res: Response) => {
         }
       }),
     }
-
-    // if (search && typeof search === 'string') {
-    //   const standard = search.toLowerCase()
-    //   condition = {
-    //     $or: [
-    //       {
-    //         detail: { $regex: new RegExp('.*' + standard + '.*', 'i') },
-    //       },
-    //       { topic_name: { $regex: new RegExp('.*' + standard + '.*', 'i') } },
-    //     ],
-    //   }
-    // }
-    // const result = await Topic.find(condition)
-
-    // console.log('topics', result.length)
-
-    // const topicIdList: string[] = []
-
-    // result.forEach((item) => {
-    //   if (!topicIdList.includes(item.id)) {
-    //     topicIdList.push(item.id)
-    //   }
-    // })
 
     res.status(200).send(result)
   } catch (error) {
