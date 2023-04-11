@@ -36,8 +36,7 @@ const loginAsync = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { username, user_id: result.id, role: result.role },
-      ACCESS_TOKEN_STATIC,
-      { expiresIn: EXPIRATION_TIME }
+      ACCESS_TOKEN_STATIC
     )
 
     if (result.role === 'student') {
