@@ -11,9 +11,11 @@ const studentRoutes = (app: Express) => {
 
   router.get('/', studentController.getManyAsync)
 
-  router.post('/update', studentController.updateByIdAsync)
+  router.put('/update', studentController.updateByIdAsync)
 
   router.put('/', studentController.studentSelectTopicAsync)
+
+  router.delete('/:id', studentController.deleteByIdAasync)
 
   app.use('/api/students', router)
 }

@@ -19,6 +19,7 @@ const createAsync = async (req: Request, res: Response) => {
       academic_year,
       specialization,
       selected_topic_id,
+      email,
     }: IStudent = req.body
 
     const { username, password } = req.body
@@ -31,7 +32,8 @@ const createAsync = async (req: Request, res: Response) => {
       !phone_number ||
       !address ||
       !username ||
-      !password
+      !password ||
+      !email
     ) {
       res.status(400).send({ message: 'Missing required fields' })
       return
@@ -68,6 +70,7 @@ const createAsync = async (req: Request, res: Response) => {
       academic_year,
       specialization,
       selected_topic_id,
+      email,
     })
 
     res.status(200).send({ data: newStudent })
@@ -154,10 +157,34 @@ const studentSelectTopicAsync = async (req: Request, res: Response) => {
   }
 }
 
+const deleteByIdAasync = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    if (!id) {
+      res.status(400).send({ message: 'Missing id' })
+      return
+    }
+
+    const deletedStudent = await Student.findByIdAndDelete(id)
+
+    const deletedAccount = await Account.findByIdAndDelete(
+      deletedStudent?.user_id
+    )
+
+    if (deletedAccount) {
+      console.log('deletedAccount')
+    }
+    res.status(200).send({ message: 'Deleted student' })
+  } catch (error) {
+    res.status(400).send({ message: 'System error' })
+  }
+}
+
 export default {
   createAsync,
   getByIdAsync,
   getManyAsync,
   updateByIdAsync,
   studentSelectTopicAsync,
+  deleteByIdAasync,
 }

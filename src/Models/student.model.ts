@@ -13,7 +13,7 @@ const studentSchema = new Schema(
     },
     date_of_birth: { type: Date, required: true },
     gender: { type: String, enum: ['male', 'female', 'other'], required: true },
-    email: { type: String, required: true },
+    email: { type: String },
     phone_number: { type: String, required: true },
     address: { type: String, required: true },
     academic_year: { type: Number, required: false },

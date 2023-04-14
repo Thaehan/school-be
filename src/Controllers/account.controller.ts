@@ -20,7 +20,7 @@ const createAsync = async (req: Request, res: Response) => {
       return
     }
 
-    if (password.length < 8 || password.length > 16) {
+    if (password.length < 6 || password.length > 16) {
       res
         .status(400)
         .send({ message: 'Password length must be between 6 and 16!' })
@@ -40,7 +40,7 @@ const createAsync = async (req: Request, res: Response) => {
     }
     const newAccount = new Account(data)
     const result = await newAccount.save()
-    res.status(200).send(result)
+    res.status(200).send(result.toJSON())
   } catch (error) {
     res.status(400).send({ message: error })
     return
