@@ -11,7 +11,7 @@ const studentRoutes = (app: Express) => {
 
   router.get('/', categoryController.getManyAsync)
 
-  router.post('/update', categoryController.updateByIdAsync)
+  router.put('/', categoryController.updateByIdAsync)
 
   app.use('/api/categories', router)
 }

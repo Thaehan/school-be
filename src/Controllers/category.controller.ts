@@ -78,6 +78,16 @@ const updateByIdAsync = async (req: Request, res: Response) => {
     if (!id || !data) {
       res.status(400).send({ message: 'Please fill the id and data!' })
     } else {
+      // const existedCategory = await Category.find({
+      //   $or: [
+      //     { category_name: data.category_name },
+      //     { category_code: data.category_code },
+      //   ],
+      // })
+      // if (existedCategory.length == 1 && (data.category_name == category)) {
+      //   res.status(400).send({ message: 'Category name or code existed!' })
+      //   return
+      // }
       const result = await Category.findByIdAndUpdate(id, data)
       if (result) {
         res
