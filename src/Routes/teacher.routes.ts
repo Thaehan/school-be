@@ -11,7 +11,9 @@ const teacherRoutes = (app: Express) => {
 
   router.get('/', teacherController.getManyAsync)
 
-  router.post('/update', teacherController.updateByIdAsync)
+  router.put('/', teacherController.updateByIdAsync)
+
+  router.delete('/:id', teacherController.deleteByIdAsync)
 
   app.use('/api/teachers', router)
 }

@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 
 import { accounts, teachers } from '../Models'
 import { ITeacher } from '../Types'
-import { hashFunction } from '../Utils/UtilityFunctions'
+import { hashFunction, hashSyncFunction } from '../Utils/UtilityFunctions'
 
 const Teacher = teachers
 const Account = accounts
@@ -18,6 +18,7 @@ const createAsync = async (req: Request, res: Response) => {
       address,
       main_courses,
       topic_ids,
+      email,
     }: ITeacher = req.body
     const { username, password } = req.body
 
@@ -29,7 +30,8 @@ const createAsync = async (req: Request, res: Response) => {
       !date_of_birth ||
       !gender ||
       !phone_number ||
-      !address
+      !address ||
+      !email
     ) {
       res.status(400).send({ message: 'Missing required field(s)' })
       return
@@ -51,7 +53,7 @@ const createAsync = async (req: Request, res: Response) => {
 
     const newAccount = await Account.create({
       username,
-      password: hashFunction(password),
+      password: hashSyncFunction(password),
       role: 'teacher',
     })
 
@@ -65,6 +67,7 @@ const createAsync = async (req: Request, res: Response) => {
       main_courses,
       topic_ids,
       user_id: newAccount.id,
+      email,
     })
 
     res.status(200).send({
@@ -127,9 +130,25 @@ const updateByIdAsync = async (req: Request, res: Response) => {
   }
 }
 
+const deleteByIdAsync = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    if (!id) {
+      res.status(400).send({ message: 'Cần nhập vào id của Teacher!' })
+      return
+    }
+    const result = await Teacher.findByIdAndDelete(id)
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(400).send({ message: error })
+    return
+  }
+}
+
 export default {
   createAsync,
   getByIdAsync,
   getManyAsync,
   updateByIdAsync,
+  deleteByIdAsync,
 }
