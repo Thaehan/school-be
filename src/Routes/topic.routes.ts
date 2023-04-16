@@ -12,7 +12,9 @@ const topicRoutes = (app: Express) => {
 
   router.get('/:id', auth, topicController.getByIdAsync)
 
-  router.put('/:id', topicController.updateByIdAsync)
+  router.put('/', topicController.updateByIdAsync)
+
+  router.delete('/:id', topicController.deleteByIdAsync)
 
   app.use('/api/topics', router)
 }

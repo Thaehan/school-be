@@ -9,9 +9,9 @@ const Category = category
 
 const createAsync = async (req: Request, res: Response) => {
   try {
-    const { topic_name, detail, teacher_id }: ITopic = req.body
+    const { topic_name, detail, teacher_id, tags }: ITopic = req.body
 
-    if (!topic_name || detail || teacher_id) {
+    if (!topic_name || !detail || !teacher_id || !tags) {
       res.status(400).send({ message: 'Missing required field' })
       return
     }
@@ -26,8 +26,8 @@ const createAsync = async (req: Request, res: Response) => {
     const newTopic = await Topic.create({
       topic_name,
       detail,
+      tags,
       teacher_id,
-      selected_student: [],
     })
 
     res.status(200).send({ data: newTopic, message: 'Created a new topic' })
@@ -99,7 +99,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
     const { id } = req.params
     console.log('get by id')
     if (!id || id.length == 0) {
-      res.status(400).send({ message: 'Cần nhập vào id của Student!' })
+      res.status(400).send({ message: 'Cần nhập vào id của topic!' })
       return
     }
 
@@ -110,7 +110,7 @@ const getByIdAsync = async (req: Request, res: Response) => {
       return
     }
 
-    res.status(404).send({ message: `Cannot find student with id: ${id}` })
+    res.status(404).send({ message: `Cannot find topic with id: ${id}` })
   } catch (error) {
     res.status(400).send({ message: error })
     return
@@ -140,9 +140,32 @@ const updateByIdAsync = async (req: Request, res: Response) => {
   }
 }
 
+const deleteByIdAsync = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    if (!id || id.length == 0) {
+      res.status(400).send({ message: 'Cần nhập vào id của topic!' })
+      return
+    }
+
+    const result = await Topic.findByIdAndDelete(id)
+
+    if (result) {
+      res.status(200).send(result)
+      return
+    }
+
+    res.status(404).send({ message: `Cannot find topic with id: ${id}` })
+  } catch (error) {
+    res.status(400).send({ message: error })
+    return
+  }
+}
+
 export default {
   createAsync,
   getByIdAsync,
   getManyAsync,
   updateByIdAsync,
+  deleteByIdAsync,
 }

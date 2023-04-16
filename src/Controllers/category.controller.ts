@@ -41,7 +41,7 @@ const getManyAsync = async (req: Request, res: Response) => {
   try {
     const query = req.query
     console.log(query)
-    const result = await Category.find(query)
+    const result = await Category.find(query).sort({ createdAt: -1 })
     res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: 'Lỗi query truyền vào!' })

@@ -165,14 +165,18 @@ const deleteByIdAasync = async (req: Request, res: Response) => {
       return
     }
 
-    const deletedStudent = await Student.findByIdAndDelete(id)
+    const deletedStudent = await Student.findById(id)
+
+    if (!deletedStudent) {
+      res.status(400).send({ message: 'Not found' })
+    }
 
     const deletedAccount = await Account.findByIdAndDelete(
       deletedStudent?.user_id
     )
 
     if (deletedAccount) {
-      console.log('deletedAccount')
+      await deletedStudent?.remove()
     }
     res.status(200).send({ message: 'Deleted student' })
   } catch (error) {

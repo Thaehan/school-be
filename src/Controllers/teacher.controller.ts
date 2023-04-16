@@ -137,8 +137,22 @@ const deleteByIdAsync = async (req: Request, res: Response) => {
       res.status(400).send({ message: 'Cần nhập vào id của Teacher!' })
       return
     }
-    const result = await Teacher.findByIdAndDelete(id)
-    res.status(200).send(result)
+
+    const deletedTeacher = await Teacher.findById(id)
+
+    if (!deletedTeacher) {
+      res.status(400).send({ message: 'Not found' })
+    }
+
+    const deletedAccount = await Account.findByIdAndDelete(
+      deletedTeacher?.user_id
+    )
+
+    if (deletedAccount) {
+      await deletedTeacher?.remove()
+    }
+
+    res.status(200).send(deletedTeacher)
   } catch (error) {
     res.status(400).send({ message: error })
     return
