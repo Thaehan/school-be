@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
 
-import { topics, teachers, students, category } from '../Models'
+import { topics, teachers, category } from '../Models'
 import { ITopic } from '../Models/topic.model'
+import { regexString } from '../Utils/UtilityFunctions'
 
 const Topic = topics
 const Teacher = teachers
@@ -28,6 +29,8 @@ const createAsync = async (req: Request, res: Response) => {
       detail,
       tags,
       teacher_id,
+      rating: [],
+      ratingPoint: 0,
     })
 
     res.status(200).send({ data: newTopic, message: 'Created a new topic' })
@@ -49,10 +52,10 @@ const getManyAsync = async (req: Request, res: Response) => {
       condition = {
         $or: [
           {
-            category_name: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+            category_name: { $regex: regexString(standard), $options: 'i' },
           },
           {
-            category_code: { $regex: new RegExp('.*' + standard + '.*', 'i') },
+            category_code: { $regex: regexString(standard), $options: 'i' },
           },
         ],
       }
@@ -75,6 +78,20 @@ const getManyAsync = async (req: Request, res: Response) => {
       tags: { $in: listCategoryId },
     })
 
+    console.log(listTopic)
+
+    listTopic.sort((a, b) => {
+      if (a.ratingPoint < b.ratingPoint) {
+        return 1
+      }
+      if (a.ratingPoint > b.ratingPoint) {
+        return -1
+      }
+      return 0
+    })
+
+    console.log(listTopic)
+
     const result = {
       teachers: listTeacher,
       topics: listTopic.map((item) => {
@@ -89,6 +106,7 @@ const getManyAsync = async (req: Request, res: Response) => {
 
     res.status(200).send(result)
   } catch (error) {
+    console.log(error)
     res.status(400).send({ message: 'Lỗi query truyền vào!' })
     return
   }
@@ -162,10 +180,60 @@ const deleteByIdAsync = async (req: Request, res: Response) => {
   }
 }
 
+const ratingTopicAsync = async (req: Request, res: Response) => {
+  try {
+    const { teacherId, topicId, rating } = req.body
+    if (!teacherId || !topicId || !rating) {
+      res.status(400).send({ message: 'Missing required field(s)!' })
+      return
+    }
+
+    const topic = await Topic.findById(topicId)
+
+    if (!topic) {
+      res.status(404).send({ message: `Cannot find topic with id: ${topicId}` })
+      return
+    }
+
+    const currentTopicRating = topic.rating
+    let currentRatingPoint = rating
+
+    let existedRatingIndex = -1
+
+    currentTopicRating.forEach((item, index) => {
+      if (item.level && item.teacherId !== teacherId) {
+        currentRatingPoint += item.level
+      }
+      if (item.teacherId == teacherId) {
+        existedRatingIndex = index
+      }
+    })
+
+    if (existedRatingIndex >= 0) {
+      currentTopicRating[existedRatingIndex] = { level: rating, teacherId }
+    } else {
+      currentTopicRating.push({ level: rating, teacherId })
+    }
+
+    const updatedTopic = await Topic.findByIdAndUpdate(topicId, {
+      rating: currentTopicRating,
+      ratingPoint: currentRatingPoint / currentTopicRating.length,
+    })
+
+    if (updatedTopic) {
+      res.status(200).send({ message: 'Updated' })
+    }
+  } catch (error) {
+    res.status(400).send({ message: error })
+    return
+  }
+}
+
 export default {
   createAsync,
   getByIdAsync,
   getManyAsync,
   updateByIdAsync,
   deleteByIdAsync,
+  ratingTopicAsync,
 }

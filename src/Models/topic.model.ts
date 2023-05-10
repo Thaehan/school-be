@@ -9,6 +9,19 @@ const topicSchema = new Schema(
       required: false,
     },
     teacher_id: { type: String, required: true },
+    rating: {
+      type: [
+        {
+          teacherId: String,
+          level: Number,
+        },
+      ],
+      required: true,
+    },
+    ratingPoint: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,

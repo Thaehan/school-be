@@ -14,6 +14,8 @@ const topicRoutes = (app: Express) => {
 
   router.put('/', topicController.updateByIdAsync)
 
+  router.put('/rating/', topicController.ratingTopicAsync)
+
   router.delete('/:id', topicController.deleteByIdAsync)
 
   app.use('/api/topics', router)

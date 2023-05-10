@@ -14,3 +14,7 @@ export const hashFunction = async (plaintext: string) => {
 export const hashSyncFunction = (plainText: string) => {
   return hashSync(plainText, hashSaltRound)
 }
+
+export const regexString = (str: string) => {
+  return `.*${str.toLowerCase()}.*`
+}
