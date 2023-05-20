@@ -5,6 +5,7 @@ import studentModel from './student.model'
 import teacherModel from './teacher.model'
 import topicModel from './topic.model'
 import categoryModel from './category.model'
+import conversationModel from './conversation.model'
 
 mongoose.Promise = global.Promise
 
@@ -15,6 +16,7 @@ export const students = studentModel(mongoose)
 export const teachers = teacherModel(mongoose)
 export const topics = topicModel(mongoose)
 export const category = categoryModel(mongoose)
+export const conversations = conversationModel(mongoose)
 
 export default {
   mongoose,
@@ -24,4 +26,5 @@ export default {
   teachers,
   topics,
   category,
+  conversations,
 }

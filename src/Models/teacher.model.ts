@@ -28,6 +28,7 @@ const teacherModel = (mongoose: Mongoose) => {
   teacherSchema.method('toJSON', function () {
     const { _id, ...object } = this.toObject()
     object.id = _id
+    delete object.__v
     return object
   })
 

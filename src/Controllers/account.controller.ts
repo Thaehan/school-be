@@ -65,10 +65,8 @@ const findOneAsync = async (req: Request, res: Response) => {
 
 const getManyAsync = async (req: Request, res: Response) => {
   try {
-    const query = req.query
-    console.log(query)
-    const result = await Account.find(query)
-    res.status(200).send({ data: result })
+    const result = await Account.find()
+    res.status(200).send(result)
   } catch (error) {
     res.status(400).send({ message: error })
     return

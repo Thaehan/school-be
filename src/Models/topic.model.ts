@@ -32,6 +32,7 @@ const topicModel = (mongoose: Mongoose) => {
   topicSchema.method('toJSON', function () {
     const { _id, ...object } = this.toObject()
     object.id = _id
+    delete object.__v
     return object
   })
 

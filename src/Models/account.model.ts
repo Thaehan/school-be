@@ -19,6 +19,7 @@ const accountModel = (mongoose: Mongoose) => {
   accountSchema.method('toJSON', function () {
     const { _id, ...object } = this.toObject()
     object.id = _id
+    delete object.__v
     return object
   })
 
