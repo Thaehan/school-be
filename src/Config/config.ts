@@ -10,5 +10,5 @@ export default {
   url,
   ACCESS_TOKEN_STATIC,
   testingUrl,
-  EXPIRATION_TIME
+  EXPIRATION_TIME,
 }

@@ -1,36 +1,46 @@
 import express from 'express'
+import http from 'http'
+import { Server } from 'socket.io'
 import dotenv from 'dotenv'
-import cors from 'cors'
-
-import db from './Models'
-import { setRoutes } from './Routes'
-import { createAdmin } from './Utils/Migrate'
 
 dotenv.config()
-const app = express()
-const port = process.env.PORT || 8080
-const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:8081'],
-}
 
-app.use(cors(corsOptions))
+const PORT = process.env.PORT
+
+const app = express()
+const server = http.createServer(app)
+const io = new Server(server)
 
 app.use(express.json())
-
 app.use(express.urlencoded({ extended: true }))
+app.use(express.static('public'))
 
-db.mongoose
-  .connect(db.url)
-  .then(() => {
-    console.log('Connected to database')
-    createAdmin()
+app.get('/hello', (request, response) => {
+  response.status(200).send('Hello World')
+})
+
+// Handle WebRTC signaling
+io.on('connection', (socket) => {
+  console.log('New user connected')
+
+  // Generate a room ID for new connections
+  socket.on('join-room', (roomId, userId) => {
+    socket.join(roomId)
+    socket.to(roomId).emit('user-connected', userId)
+    console.log(io.sockets._ids)
+
+    socket.on('disconnect', () => {
+      socket.to(roomId).emit('user-disconnected', userId)
+    })
   })
-  .catch((error) => {
-    console.error(error)
+
+  // Handle signaling data exchange
+  socket.on('signal', (roomId, signalData) => {
+    socket.to(roomId).emit('signal', signalData)
   })
+})
 
-setRoutes(app)
-
-app.listen(port, () => {
-  console.log('listening on port ', port)
+//Init
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`)
 })
